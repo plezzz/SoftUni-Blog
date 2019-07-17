@@ -56,6 +56,12 @@ class Article
     private $authorId;
 
     /**
+     * @var integer
+     * @ORM\Column(name="view_count", type="integer")
+     */
+    private $viewCount;
+
+    /**
      * Get id
      *
      * @return int
@@ -72,6 +78,13 @@ class Article
      * @ORM\JoinColumn(name="authorId",referencedColumnName="id")
      */
     private $author;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="image_url", type="text")
+     */
+    private $imageUrl;
 
     public function __construct()
     {
@@ -207,6 +220,38 @@ class Article
         $this->author = $author;
 
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getViewCount()
+    {
+        return $this->viewCount;
+    }
+
+    /**
+     * @param int $viewCount
+     */
+    public function setViewCount($viewCount)
+    {
+        $this->viewCount = $viewCount;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImageUrl()
+    {
+        return $this->imageUrl;
+    }
+
+    /**
+     * @param string $imageUrl
+     */
+    public function setImageUrl($imageUrl)
+    {
+        $this->imageUrl = $imageUrl;
     }
 
 

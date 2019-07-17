@@ -4,6 +4,7 @@ namespace SoftUniBlogBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use SoftUniBlogBundle\Entity\Article;
+use SoftUniBlogBundle\Entity\User;
 use SoftUniBlogBundle\Form\ArticleType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -31,6 +32,7 @@ class ArticleController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
 
             $article->setAuthor($this->getUser());
+            $article->setViewCount(0);
             $em = $this->getDoctrine()->getManager();
             $em->persist($article);
             $em->flush();
@@ -52,7 +54,17 @@ class ArticleController extends Controller
     public function viewArticle($id)
     {
 
-        $article = $this->getDoctrine()->getRepository(Article::class)->find($id);
+        $article = $this->getDoctrine()
+            ->getRepository(Article::class)
+            ->find($id);
+
+        if (null===$article){
+            return $this->redirectToRoute("blog_index");
+        }
+        $article->setViewCount($article->getViewCount() + 1);
+        $em=$this->getDoctrine()->getManager();
+        $em->persist($article);
+        $em->flush();
 
         return $this->render('article/view.html.twig', [
             'article' => $article
@@ -72,6 +84,10 @@ class ArticleController extends Controller
         $article = $this->getDoctrine()->getRepository(Article::class)->find($id);
 
         if ($article === null) {
+            return $this->redirectToRoute("blog_index");
+        }
+
+        if ($this->isAuthorOrAdmin($article)) {
             return $this->redirectToRoute("blog_index");
         }
 
@@ -128,5 +144,38 @@ class ArticleController extends Controller
             array('article' => $article,
                 'form' => $form->createView()
             ));
+    }
+
+    /**
+     * @param Article $article
+     * @return bool
+     */
+    private function isAuthorOrAdmin(Article $article)
+    {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        if (!$currentUser->isAuthor($article) && !$currentUser->isAdmin()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @Route("/articles/my_articles",name="my_articles")
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
+     *
+     * @return Response
+     */
+    public function getAllArticlesByUser()
+    {
+
+        $articles = $this->getDoctrine()
+            ->getRepository(Article::class)
+            ->findBy(['author' => $this->getUser()]);
+
+        return $this->render("article/myArticles.html.twig",
+            ["articles" => $articles]
+        );
     }
 }
