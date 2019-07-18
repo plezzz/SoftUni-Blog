@@ -14,7 +14,9 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
-        $articles=$this->getDoctrine()->getRepository(Article::class)->findAll();
+        $articles=$this->getDoctrine()
+            ->getRepository(Article::class)
+            ->findBy([],['dateAdded' => 'DESC']);
 
         return $this->render('blog/index.html.twig', [
             'articles'=>$articles

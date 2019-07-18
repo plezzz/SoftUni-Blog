@@ -251,6 +251,9 @@ class User implements UserInterface
         return $article->getAuthorId() == $this->getId();
     }
 
+    /**
+     * @return bool
+     */
     public function isAdmin()
     {
         return in_array("ROLE_ADMIN", $this->getRoles());

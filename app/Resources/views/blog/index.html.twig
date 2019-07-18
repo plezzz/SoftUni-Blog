@@ -3,6 +3,21 @@
 {% block body %}
     <div class="container body-content">
         <div class="row">
+
+            {% for msg in app.session.flashbag.get('info') %}
+            <div class="alert alert-success" id="info">
+                {{ msg }}
+            </div>
+            {% endfor %}
+
+            {% for msg in app.session.flashbag.get('errors') %}
+                <div class="alert alert-success">
+                    {{ msg }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                </div>
+            {% endfor %}
+
             {% for article in articles %}
                 <div class="col-md-6">
                     <article>
@@ -21,9 +36,8 @@
 
                         <small>
                             Views: {{ article.viewCount }}
-                        </small>
-                        <small class="author">
-                            {{ article.author.fullName }}
+                            <span class="author">{{ article.author.fullName }} </span>
+                            Data Added: {{ article.dateAdded|date("F jS \\a\\t g:ia") }}
                         </small>
 
                         <footer>

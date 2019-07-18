@@ -37,6 +37,7 @@ class ArticleController extends Controller
             $em->persist($article);
             $em->flush();
 
+            $this->addFlash("info", "Create article  successfully");
             return $this->redirectToRoute('blog_index');
         }
 
@@ -58,11 +59,11 @@ class ArticleController extends Controller
             ->getRepository(Article::class)
             ->find($id);
 
-        if (null===$article){
+        if (null === $article) {
             return $this->redirectToRoute("blog_index");
         }
         $article->setViewCount($article->getViewCount() + 1);
-        $em=$this->getDoctrine()->getManager();
+        $em = $this->getDoctrine()->getManager();
         $em->persist($article);
         $em->flush();
 
@@ -172,7 +173,10 @@ class ArticleController extends Controller
 
         $articles = $this->getDoctrine()
             ->getRepository(Article::class)
-            ->findBy(['author' => $this->getUser()]);
+            ->findBy(
+                ['author' => $this->getUser()],
+                ['dateAdded' => 'DESC']
+            );
 
         return $this->render("article/myArticles.html.twig",
             ["articles" => $articles]
